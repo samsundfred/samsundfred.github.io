@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Print Offerte Calculator</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    margin: 0;
+    padding: 40px 20px;
+}
+
+.container {
+    max-width: 950px;
+    margin: auto;
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+}
+
+input, select, textarea, button {
+    padding: 10px;
+    margin: 8px 0;
+    width: 100%;
+    max-width: 400px;
+}
+
+textarea { height: 80px; }
+
+button {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover { background: #45a049; }
+
+.section-title {
+    margin-top: 25px;
+    font-weight: bold;
+}
+
+.result {
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+.breakdown {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #555;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h2>3D Print Offerte Calculator</h2>
+
+<div class="section-title">Klant Informatie</div>
+<input type="text" id="customerName" placeholder="Klant Naam">
+<input type="text" id="contactInfo" placeholder="Contact Informatie (email / phone)">
+<input type="text" id="projectName" placeholder="Project Naam">
+<textarea id="projectDescription" placeholder="Project Beschrijving"></textarea>
+<input type="text" id="employeeName" placeholder="Werknemer Naam">
+
+<div class="section-title">Ontwerp Services</div>
+<label>
+<input type="checkbox" id="designToggle" onchange="toggleDesignHours()">
+ Model Moet nog ontworpen worden
+</label>
+<input type="number" id="designHours" placeholder="Design Hours" min="1" style="display:none;">
+
+<div class="section-title">Print Details</div>
+<select id="materialSelect"></select>
+<input type="number" id="weightInput" placeholder="Weight per Part (grams)" min="1">
+<input type="number" id="quantityInput" placeholder="Quantity" min="1" value="1">
+
+<button onclick="runQuote()">Bereken Offerte</button>
+<button onclick="downloadPDF()">Download Offerte PDF</button>
+
+<div class="result" id="totalResult"></div>
+<div class="breakdown" id="costBreakdown"></div>
+
+<canvas id="priceChart"></canvas>
+</div>
+
+<script>
+
+/* ================= CONFIG ================= */
+
+const CONFIG = {
+    companyName: "Itsociaal",
+    setupFee: 10,
+    designHourlyRate: 15,
+    markupPercent: 30,
+    materials: {
+        PLA: { costPerKg: 20, wastePercent: 5 },
+        ABS: { costPerKg: 25, wastePercent: 8 },
+        PETG: { costPerKg: 28, wastePercent: 6 },
+        Nylon: { costPerKg: 45, wastePercent: 10 }
+    }
+};
+
+/* ================= PRICING ENGINE ================= */
+
+function calculateMaterialCost(materialKey, weight, quantity) {
+    const material = CONFIG.materials[materialKey];
+    const totalWeight = weight * quantity;
+    const effectiveWeight = totalWeight * (1 + material.wastePercent / 100);
+    return (effectiveWeight / 1000) * material.costPerKg;
+}
+
+function calculateDesignCost(hours) {
+    return hours * CONFIG.designHourlyRate;
+}
+
+function applyMarkup(subtotal) {
+    return subtotal * (1 + CONFIG.markupPercent / 100);
+}
+
+function generateQuoteNumber() {
+    return "Q-" + Date.now();
+}
+
+function calculateQuote(data) {
+
+    const materialCost = calculateMaterialCost(data.material, data.weight, data.quantity);
+    const setupFee = CONFIG.setupFee;
+
+    let designCost = 0;
+    if (data.designNeeded) {
+        designCost = calculateDesignCost(data.designHours);
+    }
+
+    const subtotal = materialCost + setupFee + designCost;
+    const total = applyMarkup(subtotal);
+
+    return {
+        ...data,
+        materialCost,
+        setupFee,
+        designCost,
+        subtotal,
+        total,
+        quoteNumber: generateQuoteNumber(),
+        date: new Date().toLocaleDateString()
+    };
+}
+
+/* ================= UI ================= */
+
+let lastQuote = null;
+
+function populateMaterials() {
+    const select = document.getElementById("materialSelect");
+    for (let key in CONFIG.materials) {
+        const option = document.createElement("option");
+        option.value = key;
+        option.textContent = key;
+        select.appendChild(option);
+    }
+}
+
+function toggleDesignHours() {
+    const toggle = document.getElementById("designToggle");
+    const hoursField = document.getElementById("designHours");
+    hoursField.style.display = toggle.checked ? "block" : "none";
+}
+
+function runQuote() {
+
+    const data = {
+        customerName: document.getElementById("customerName").value,
+        contactInfo: document.getElementById("contactInfo").value,
+        projectName: document.getElementById("projectName").value,
+        projectDescription: document.getElementById("projectDescription").value,
+        employeeName: document.getElementById("employeeName").value,
+        material: document.getElementById("materialSelect").value,
+        weight: parseFloat(document.getElementById("weightInput").value),
+        quantity: parseInt(document.getElementById("quantityInput").value),
+        designNeeded: document.getElementById("designToggle").checked,
+        designHours: parseInt(document.getElementById("designHours").value) || 0
+    };
+
+    if (!data.weight || !data.quantity) {
+        alert("Voer in het gewicht en het aantal");
+        return;
+    }
+
+    if (data.designNeeded && data.designHours <= 0) {
+        alert("Voer ontwerp uren in");
+        return;
+    }
+
+    const quote = calculateQuote(data);
+    lastQuote = quote;
+
+    document.getElementById("totalResult").innerHTML =
+        "<strong>Totaal prijs: €" + quote.total.toFixed(2) + "</strong>";
+
+    document.getElementById("costBreakdown").innerHTML =
+        "Materiaal: $" + quote.materialCost.toFixed(2) +
+        "<br>Setup Fee: €" + quote.setupFee.toFixed(2) +
+        (quote.designCost > 0 ? "<br>Design Cost: $" + quote.designCost.toFixed(2) : "") +
+        "<br>Subtotal: €" + quote.subtotal.toFixed(2) +
+        "<br>Markup: " + CONFIG.markupPercent + "%";
+}
+
+/* ============================
+   BEAUTIFUL PDF (UPDATED BACKEND)
+============================ */
+
+function downloadPDF() {
+
+    if (!lastQuote) {
+        alert("Genereer Offerte eerst");
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 20;
+    let y = 40;
+
+    /* ============================
+       HEADER
+    ============================ */
+
+    doc.setFillColor(25, 25, 25);
+    doc.rect(0, 0, pageWidth, 30, "F");
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.setTextColor(255, 255, 255);
+    doc.text(CONFIG.companyName, margin, 18);
+
+    doc.setFontSize(12);
+    doc.text("3D PRINT QUOTE", pageWidth - margin, 18, { align: "right" });
+
+    doc.setTextColor(0, 0, 0);
+
+    /* ============================
+       QUOTE META
+    ============================ */
+
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+
+    doc.text(`Quote #: ${lastQuote.quoteNumber}`, margin, y);
+    doc.text(`Date: ${lastQuote.date}`, pageWidth - margin, y, { align: "right" });
+
+    y += 10;
+    doc.setDrawColor(200);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 12;
+
+    /* ============================
+       CUSTOMER SECTION
+    ============================ */
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Klant Informatie", margin, y);
+    y += 8;
+
+    doc.setFont("helvetica", "normal");
+
+    if (lastQuote.customerName) {
+        doc.text(`Klant: ${lastQuote.customerName}`, margin, y);
+        y += 6;
+    }
+
+    if (lastQuote.contactInfo) {
+        doc.text(`Contact: ${lastQuote.contactInfo}`, margin, y);
+        y += 6;
+    }
+
+    if (lastQuote.projectName) {
+        doc.text(`Project: ${lastQuote.projectName}`, margin, y);
+        y += 6;
+    }
+
+    if (lastQuote.employeeName) {
+        doc.text(`Afgehandeld door: ${lastQuote.employeeName}`, margin, y);
+        y += 6;
+    }
+
+    y += 6;
+
+    /* ============================
+       DESCRIPTION BOX (AUTO HEIGHT)
+    ============================ */
+
+    if (lastQuote.projectDescription) {
+
+        doc.setFont("helvetica", "bold");
+        doc.text("Project Description", margin, y);
+        y += 6;
+
+        const splitText = doc.splitTextToSize(
+            lastQuote.projectDescription,
+            pageWidth - margin * 2 - 10
+        );
+
+        const boxHeight = splitText.length * 6 + 10;
+
+        doc.setDrawColor(180);
+        doc.rect(margin, y, pageWidth - margin * 2, boxHeight);
+
+        doc.setFont("helvetica", "normal");
+        doc.text(splitText, margin + 5, y + 8);
+
+        y += boxHeight + 12;
+    }
+
+    /* ============================
+       PRODUCTION DETAILS
+    ============================ */
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Production Details", margin, y);
+    y += 8;
+
+    doc.setFont("helvetica", "normal");
+
+    doc.text(`Materiaal: ${lastQuote.material}`, margin, y);
+    y += 6;
+
+    doc.text(`Gewicht per onderdeel: ${lastQuote.weight} g`, margin, y);
+    y += 6;
+
+    doc.text(`Hoeveelheid: ${lastQuote.quantity}`, margin, y);
+    y += 6;
+
+    if (lastQuote.designCost > 0) {
+        doc.text(`Ontwikkelings uren: ${lastQuote.designHours}`, margin, y);
+        y += 6;
+
+        doc.text(`Ontwikkelings kosten: €${lastQuote.designCost.toFixed(2)}`, margin, y);
+        y += 6;
+    }
+
+    y += 12;
+
+    /* ============================
+       TOTALS PANEL (RIGHT SIDE BOX)
+    ============================ */
+
+    const boxWidth = 80;
+    const boxX = pageWidth - margin - boxWidth;
+    const startY = y;
+
+    let priceY = startY + 8;
+
+    doc.setDrawColor(0);
+    doc.rect(boxX, startY, boxWidth, 40);
+
+    doc.setFont("helvetica", "normal");
+
+    doc.text("Material Cost:", boxX + 6, priceY);
+    doc.text(`$${lastQuote.materialCost.toFixed(2)}`, boxX + boxWidth - 6, priceY, { align: "right" });
+    priceY += 6;
+
+    doc.text("Setup Fee:", boxX + 6, priceY);
+    doc.text(`$${lastQuote.setupFee.toFixed(2)}`, boxX + boxWidth - 6, priceY, { align: "right" });
+    priceY += 6;
+
+    doc.text("Subtotal:", boxX + 6, priceY);
+    doc.text(`$${lastQuote.subtotal.toFixed(2)}`, boxX + boxWidth - 6, priceY, { align: "right" });
+    priceY += 8;
+
+    doc.setFont("helvetica", "bold");
+    doc.text("TOTAL:", boxX + 6, priceY);
+    doc.text(`$${lastQuote.total.toFixed(2)}`, boxX + boxWidth - 6, priceY, { align: "right" });
+
+    y = startY + 50;
+
+    /* ============================
+       FOOTER
+    ============================ */
+
+    const pageCount = doc.getNumberOfPages();
+
+    for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+
+        doc.setDrawColor(220);
+        doc.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
+
+        doc.setFontSize(9);
+        doc.setTextColor(120);
+
+        doc.text(
+            `${CONFIG.companyName} | Bedankt voor het kiezen van onse sociale werkplek`,
+            margin,
+            pageHeight - 12
+        );
+
+        doc.text(
+            `Page ${i} of ${pageCount}`,
+            pageWidth - margin,
+            pageHeight - 12,
+            { align: "right" }
+        );
+    }
+
+    doc.save(`${lastQuote.quoteNumber}.pdf`);
+}
+
+/* ================= CHART ================= */
+
+function generateChartData(materialKey) {
+    const data = [];
+    for (let g = 1; g <= 1000; g++) {
+        data.push(calculateMaterialCost(materialKey, g, 1));
+    }
+    return data;
+}
+
+let chart;
+
+function initChart() {
+    const ctx = document.getElementById("priceChart").getContext("2d");
+    chart = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: Array.from({length: 1000}, (_, i) => i + 1),
+            datasets: [{
+                label: "Materiaal kosten vs Gewicht",
+                borderColor: "#4CAF50",
+                data: generateChartData("PLA"),
+                fill: false,
+                pointRadius: 0
+            }]
+        },
+        options: { responsive: true }
+    });
+}
+
+document.getElementById("materialSelect").addEventListener("change", function() {
+    chart.data.datasets[0].data = generateChartData(this.value);
+    chart.update();
+});
+
+populateMaterials();
+initChart();
+
+</script>
+
+</body>
+</html>
