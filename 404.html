@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>404 | Page Not Found</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Segoe UI", Arial, sans-serif;
+
+    background:
+        radial-gradient(circle at top, #1e3a8a, #020617 65%);
+
+    color: white;
+}
+
+
+.container {
+    text-align: center;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px);
+
+    border: 1px solid rgba(255,255,255,.15);
+
+    border-radius: 25px;
+
+    padding: 50px;
+    max-width: 500px;
+
+    box-shadow: 0 20px 50px #0008;
+}
+
+
+.error {
+    font-size: 100px;
+    font-weight: 800;
+
+    background: linear-gradient(
+        90deg,
+        #38bdf8,
+        #a78bfa
+    );
+
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+
+h1 {
+    margin: 0;
+    font-size: 32px;
+}
+
+
+p {
+    color: #cbd5e1;
+    font-size: 18px;
+    margin: 20px 0;
+}
+
+
+.button {
+
+    display: inline-block;
+
+    margin-top: 20px;
+
+    padding: 14px 30px;
+
+    background: #38bdf8;
+
+    color: #020617;
+
+    text-decoration: none;
+
+    font-weight: bold;
+
+    border-radius: 50px;
+
+    transition: .2s;
+}
+
+
+.button:hover {
+
+    transform: translateY(-3px);
+
+    background: #7dd3fc;
+
+}
+
+
+/* little floating effect */
+
+.emoji {
+
+    font-size: 50px;
+
+    animation: float 3s infinite ease-in-out;
+
+}
+
+
+@keyframes float {
+
+    50% {
+        transform: translateY(-12px);
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+<div class="emoji">🛰️</div>
+
+<div class="error">
+404
+</div>
+
+<h1>Lost in space?</h1>
+
+<p>
+The page you were looking for does not exist,
+or it has moved somewhere else.
+</p>
+
+
+<a class="button" href="/">
+Return Home 🚀
+</a>
+
+
+</div>
+
+</body>
+</html>
