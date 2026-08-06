@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Relationship Compatibility Quiz</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<style>
+
+body{
+background:linear-gradient(135deg,#7c3aed,#ec4899,#06b6d4);
+min-height:100vh;
+color:white;
+font-family:Arial,sans-serif;
+padding:30px;
+}
+
+
+.container{
+
+max-width:900px;
+margin:auto;
+background:rgba(255,255,255,.15);
+backdrop-filter:blur(15px);
+padding:35px;
+border-radius:25px;
+
+}
+
+
+.progress{
+
+height:15px;
+background:rgba(255,255,255,.2);
+border-radius:20px;
+overflow:hidden;
+margin:25px 0;
+
+}
+
+
+.progress-bar{
+
+height:100%;
+width:0%;
+background:#facc15;
+transition:.4s;
+
+}
+
+
+.question{
+
+background:rgba(255,255,255,.12);
+padding:25px;
+border-radius:20px;
+margin-top:20px;
+
+}
+
+
+.answers{
+
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:10px;
+margin-top:20px;
+
+}
+
+
+button{
+
+padding:15px;
+border:0;
+border-radius:15px;
+cursor:pointer;
+font-weight:bold;
+
+}
+
+
+.answer{
+
+background:white;
+color:#7c3aed;
+
+}
+
+
+.answer:hover,
+.selected{
+
+background:#facc15;
+color:#111;
+
+}
+
+
+.navigation{
+
+display:flex;
+justify-content:space-between;
+margin-top:25px;
+
+}
+
+
+.nav{
+
+background:#111827;
+color:white;
+
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+<h1>❤️ Relationship Compatibility Explorer</h1>
+
+
+<p>
+
+Answer honestly. There are no right or wrong answers.
+This explores which relationship structures may align
+with your preferences and values.
+
+</p>
+
+
+
+<div class="progress">
+
+<div class="progress-bar" id="progress"></div>
+
+</div>
+
+
+<div id="quiz"></div>
+
+
+<div class="navigation">
+
+<button class="nav" id="previous">
+← Previous
+</button>
+
+
+<button class="nav" id="next">
+Next →
+</button>
+
+</div>
+
+
+</div>
+
+
+
+<script src="data/questions.js"></script>
+<script src="data/relationship-types.js"></script>
+<script src="js/quiz.js"></script>
+
+
+</body>
+</html>
