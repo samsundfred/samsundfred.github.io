@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Apps</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #111827;
+            color: white;
+            margin: 0;
+            padding: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .apps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            max-width: 900px;
+            margin: auto;
+        }
+
+        .app {
+            background: #1f2937;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            transition: 0.2s;
+        }
+
+        .app:hover {
+            transform: translateY(-5px);
+            background: #374151;
+        }
+
+        a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .icon {
+            font-size: 45px;
+        }
+
+        .name {
+            font-size: 22px;
+            margin-top: 15px;
+        }
+
+        .description {
+            color: #9ca3af;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>My Apps</h1>
+
+<div class="apps">
+
+    <a href="app1/">
+        <div class="app">
+            <div class="icon">🚀</div>
+            <div class="name">App 1</div>
+            <div class="description">My first app</div>
+        </div>
+    </a>
+
+
+    <a href="app2/">
+        <div class="app">
+            <div class="icon">🎮</div>
+            <div class="name">App 2</div>
+            <div class="description">My second app</div>
+        </div>
+    </a>
+
+
+    <a href="app3/">
+        <div class="app">
+            <div class="icon">🛠️</div>
+            <div class="name">App 3</div>
+            <div class="description">Another project</div>
+        </div>
+    </a>
+
+</div>
+
+</body>
+</html>
