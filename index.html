@@ -1,9 +1,179 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>YourName | Projects</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background:
+        radial-gradient(circle at top, #1e3a8a, #020617 60%);
+    color: white;
+    min-height: 100vh;
+}
+
+/* Hero */
+header {
+    text-align: center;
+    padding: 80px 20px 50px;
+}
+
+h1 {
+    font-size: 60px;
+    margin: 0;
+    background: linear-gradient(90deg,#38bdf8,#a78bfa);
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+.subtitle {
+    font-size: 20px;
+    color: #cbd5e1;
+    margin-top: 15px;
+}
+
+
+/* Cards */
+.container {
+    max-width: 1000px;
+    margin: auto;
+    padding: 20px;
+}
+
+.apps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+    gap: 25px;
+}
+
+
+.card {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 20px;
+    padding: 30px;
+    text-align:center;
+    transition:.3s;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow:0 20px 40px #0008;
+}
+
+
+.icon {
+    font-size:50px;
+}
+
+
+.card h2 {
+    margin:15px 0 10px;
+}
+
+
+.card p {
+    color:#cbd5e1;
+}
+
+
+.button {
+    display:inline-block;
+    margin-top:20px;
+    padding:12px 25px;
+    background:#38bdf8;
+    color:#020617;
+    border-radius:50px;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+
+footer {
+    text-align:center;
+    padding:50px;
+    color:#94a3b8;
+}
+
+</style>
+
+</head>
+
 
 <body>
-  <h1>Howdy</h1>
-  <p>Welcome to my website!</p>
-  <img src="https://content.codecademy.com/articles/github-pages-via-web-app/happy-ice-cream.gif" />
-</body>
 
+<header>
+
+<h1>YourName.dev</h1>
+
+<div class="subtitle">
+🚀 Coding projects • Apps • Experiments
+</div>
+
+</header>
+
+
+<div class="container">
+
+<div class="apps">
+
+
+<div class="card">
+<div class="icon">🎮</div>
+<h2>Game Hub</h2>
+<p>My collection of browser games.</p>
+
+<a class="button" href="app/gamehub/">
+Open
+</a>
+
+</div>
+
+
+
+<div class="card">
+<div class="icon">🤖</div>
+<h2>AI Tools</h2>
+<p>Small AI experiments and tools.</p>
+
+<a class="button" href="app/ai/">
+Open
+</a>
+
+</div>
+
+
+
+<div class="card">
+<div class="icon">🌐</div>
+<h2>Web Projects</h2>
+<p>Websites and experiments I built.</p>
+
+<a class="button" href="app/web/">
+Open
+</a>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+<footer>
+© 2026 YourName • Hosted on GitHub Pages
+</footer>
+
+
+</body>
 </html>
